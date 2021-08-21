@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -70,7 +71,7 @@ public class EasyRulesAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(value = {CentralDogma.class, ObjectMapper.class})
+    @ConditionalOnClass(value = {CentralDogma.class, ObjectMapper.class})
     public CommandLineRunner commandLineRunner(CentralDogma dogma, ObjectMapper objectMapper, BeanResolver beanResolver) {
         log.info("project:{}, repo:{},filename:{}", properties.getProject(), properties.getRepo(), properties.getConfName());
         Watcher watcher = dogma.fileWatcher(properties.getProject(), properties.getRepo(), Query.ofText(properties.getConfName()));
@@ -102,7 +103,7 @@ public class EasyRulesAutoConfiguration {
      */
     @Bean(name = "centralDogmaRules")
     @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    @ConditionalOnMissingBean(value = {CentralDogma.class, ObjectMapper.class})
+    @ConditionalOnClass(value = {CentralDogma.class, ObjectMapper.class})
     public Map<String, Rules> centralDogmaRules(BeanResolver beanResolver, CentralDogma centralDogma, ObjectMapper objectMapper) throws Exception {
         Map<String, Rules> rules = new HashMap<>();
         if (Objects.isNull(easyRules)) {
