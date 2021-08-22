@@ -24,6 +24,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 import org.springframework.expression.BeanResolver;
+import org.springframework.expression.ParserContext;
 
 import java.io.StringReader;
 import java.util.HashMap;
@@ -132,7 +133,13 @@ public class EasyRulesAutoConfiguration {
             public void accept(RulesConfig rulesConfig) {
                 log.info("load rule conf to easy rules engine:{}", rulesConfig.getRulesContent());
                 StringReader stringReader = new StringReader(rulesConfig.getRulesContent().toPrettyString());
-                SpELRuleFactory jsonRuleFactory = new SpELRuleFactory(new JsonRuleDefinitionReader(), beanResolver);
+                SpELRuleFactory jsonRuleFactory = null;
+                if(properties.isTemplate()){
+                    log.info("use spel template context ");
+                    jsonRuleFactory= new SpELRuleFactory(new JsonRuleDefinitionReader(), ParserContext.TEMPLATE_EXPRESSION, beanResolver);
+                }else{
+                    jsonRuleFactory= new SpELRuleFactory(new JsonRuleDefinitionReader(), beanResolver);
+                }
                 Rules jsonRules = null;
                 try {
                     jsonRules = jsonRuleFactory.createRules(stringReader);

@@ -12,6 +12,7 @@ public class EasyRulesEngineConfiguration {
     private boolean skipOnFirstFailedRule;
     private int priorityThreshold;
     private String project;
+    private boolean template; // spel default template_expression
     private String repo;
     private String contentType;
     private String confName;

@@ -60,6 +60,7 @@ easyrules:
   repo: demo
   contentType: json // 当前只支持json格式的，后续扩展其他的
   confName: /rules2.json
+  template: false // 是否使用spel 模版格式为 #{},默认为false，为true 需要使用#{} 格式
 centraldogma:
   hosts:
     - "127.0.0.1:36462"
