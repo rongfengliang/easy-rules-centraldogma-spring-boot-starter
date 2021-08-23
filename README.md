@@ -19,9 +19,17 @@
 * 参考demo
 
 ```code
- @RequestMapping(value = "/myrule", method = RequestMethod.POST)
+   @RestController
+public class RuleApi {
+    @Autowired
+    private Map<String, Rules> centralDogmaRules;
+    @Autowired
+    private  RulesEngine rulesEngine;
+    @Autowired
+    private ObjectMapper objectMapper;
+    @RequestMapping(value = "/myrule", method = RequestMethod.POST)
     public  Object info(@RequestBody User user) throws Exception {
-        SpringBeanUtil.centralDogmaRules().forEach(new BiConsumer<String, Rules>() {
+        centralDogmaRules.forEach(new BiConsumer<String, Rules>() {
             @Override
             public void accept(String s, Rules rules) {
                 System.out.println(s);
@@ -33,16 +41,17 @@
                 });
             }
         });
-        Rules rules =  SpringBeanUtil.centralDogmaRules().get("demoapp");
+        Rules rules =  centralDogmaRules.get("demoapp");
+        rules.register(new MyRule());
         Facts facts = new Facts();
         // 生成一个唯一id，方便基于数据id规则流程查询
-        user.setUniqueId(UUID.randomUUID().toString());
         facts.put("biz",user);
-        SpringBeanUtil.getBean("rulesEngine", RulesEngine.class).fire(rules,facts);
-        User userResult=  facts.get("biz");
+        rulesEngine.fire(rules,facts);
+        Object userResult=  facts.get("biz");
         System.out.println("result from final ruls"+userResult.toString());
         return userResult;
     }
+}
 ```
 
 * 配置说明
