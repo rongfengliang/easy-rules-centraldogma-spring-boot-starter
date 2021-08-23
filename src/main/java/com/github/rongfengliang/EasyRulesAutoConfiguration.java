@@ -112,12 +112,13 @@ public class EasyRulesAutoConfiguration {
         if (Objects.isNull(easyRules)) {
             CompletableFuture<Entry<String>> future =
                     centralDogma.getFile(properties.getProject(), properties.getRepo(), Revision.HEAD, Query.ofText(properties.getConfName()));
-            log.info("load rule  content", future.join().content());
+            log.info("load rule  content from centralDogma", future.join().content());
             List<RulesConfig> rulesConfigs = objectMapper.readValue(future.join().content(), new TypeReference<List<RulesConfig>>() {
             });
             easyRulesEntities.setRulesConfigs(rulesConfigs);
             return getStringRulesMap(beanResolver, rules);
         } else {
+            log.info("load  centralDogmaRules from local watch cache");
             return this.easyRules;
         }
 
