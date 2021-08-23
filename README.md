@@ -8,7 +8,7 @@
 
 >  当前还没有发布公共仓库，暂时需要自己构建 支持easy-rules 4.1
 
-```code
+```maven
 <dependency>
     <groupId>com.github.rongfengliang</groupId>
     <artifactId>easy-rules-centraldogma-spring-boot-starter</artifactId>
@@ -51,7 +51,7 @@
 
 src/main/resources/application.yaml
 
-```code
+```yaml
 easyrules:
   skipOnFirstAppliedRule: false
   skipOnFirstNonTriggeredRule: false
@@ -75,7 +75,11 @@ server:
 
 > 当前配置只支持基于spel的，后续会添加其他格式的
 
-```code
+
+
+`template:false` 使用如下格式:
+
+```json
 [
   {
     "rulesId": "demoapp",
@@ -147,11 +151,72 @@ server:
 
 ```
 
+`template:true` 使用如下格式：
 
+```json
+[
+  {
+    "rulesId": "demoapp",
+    "rulesContent": [
+      {
+        "name": "demo",
+        "description": "mydemo",
+        "priority": 1,
+        "compositeRuleType": "UnitRuleGroup",
+        "composingRules": [
+          {
+            "name": "first",
+            "description": "first rule",
+            "condition": "#{#biz.age > 10}",
+            "priority": 2,
+            "actions": [
+              "#{@myService.setInfo(#biz)}",
+              "#{@myService.setInfo2(#biz)}"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]
+
+```
 
 ## 代码使用说明
 
+* 基于pojo 代码的rule 添加到规则链中
 
+是直接支持的，使用方法如下:
+
+定义rule
+```code
+@Rule(priority = 0,description = "demo")
+public class MyRule {
+    @Condition
+    public boolean itRains(@Fact("biz") User user) {
+        System.out.println(user.toString());
+        return true;
+    }
+    @Action
+    public void takeAnUmbrella(@Fact("biz") User user) {
+        System.out.println("run from first");
+        System.out.println(user.toString());
+    }
+}
+```
+
+添加rule到规则链
+
+```code
+  ...
+  Rules rules =  SpringBeanUtil.centralDogmaRules().get("demoapp");
+  ...
+  rules.register(new MyRule());
+  ...
+  
+  // do rule fire and then fetch result
+  
+```
  
 ## 几个扩展点
 
@@ -198,4 +263,4 @@ public class MyRuleListener implements RuleListener {
 ```
 * ruleEnginelistener
 
-
+可以添加自己的bean，方便记录信息，方便分析rulegine的情况计划
