@@ -23,6 +23,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.expression.BeanResolver;
 import org.springframework.expression.ParserContext;
 
@@ -103,9 +104,10 @@ public class EasyRulesAutoConfiguration {
      * @throws Exception
      */
     @Bean(name = "centralDogmaRules")
-    @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+    @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE,proxyMode = ScopedProxyMode.TARGET_CLASS)
     @ConditionalOnClass(value = {CentralDogma.class, ObjectMapper.class})
     public Map<String, Rules> centralDogmaRules(BeanResolver beanResolver, CentralDogma centralDogma, ObjectMapper objectMapper) throws Exception {
+        log.info("load  centralDogmaRules");
         Map<String, Rules> rules = new HashMap<>();
         if (Objects.isNull(easyRules)) {
             CompletableFuture<Entry<String>> future =
@@ -178,7 +180,7 @@ public class EasyRulesAutoConfiguration {
      */
     @Bean
     @ConditionalOnMissingBean(RulesEngine.class)
-    @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+    @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE,proxyMode = ScopedProxyMode.TARGET_CLASS)
     public RulesEngine rulesEngine(RuleListener defaultRulesListener, RulesEngineListener defaultRuleEngineListener) {
         log.info("create rule Engine");
         RulesEngineParameters parameters = new RulesEngineParameters();
